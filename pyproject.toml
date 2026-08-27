@@ -1,0 +1,36 @@
+[project]
+name = "shopping-agent"
+version = "0.1.0"
+description = "Searches and ranks products against a household's stated needs, vetoes recalled ones, and watches prices."
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+
+dependencies = [
+    "requests>=2.31.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0",
+    "ruff>=0.6",
+]
+
+[project.scripts]
+shopping-agent = "shopping_agent.cli:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.ruff]
+line-length = 100
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.ruff.lint.per-file-ignores]
+# Calendar dates, not instants: a birthday and a recall window start have no
+# time-of-day, so date.today() is the correct call rather than an aware datetime.
+"shopping_agent/db.py" = ["DTZ011"]
+"shopping_agent/recalls.py" = ["DTZ011"]

@@ -1,0 +1,28 @@
+# Household data — never commit. See docs/adr/0003.
+# Holds member names, birthdates, and per-child safety needs.
+preferences.db
+*.db
+*.sqlite
+*.sqlite3
+
+# Secrets — API keys live in the environment only.
+.env
+.env.*
+!.env.example
+
+# Runtime artifacts. These embed absolute local paths and stack traces from
+# whichever machine produced them.
+*.log
+*.jsonl
+logs/
+.cache/
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+
+# macOS
+.DS_Store
