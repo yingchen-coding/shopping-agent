@@ -15,9 +15,11 @@ dev = [
     "pytest>=8.0",
     "ruff>=0.6",
 ]
+gui = ["PySide6>=6.5"]
 
 [project.scripts]
 shopping-agent = "shopping_agent.cli:main"
+shopping-agent-gui = "shopping_agent.gui:main"
 
 [build-system]
 requires = ["hatchling"]

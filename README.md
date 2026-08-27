@@ -21,7 +21,7 @@ lowest price; `Unknown` is *not* a low score; a `Preference` can never remove a 
 ## Setup
 
 ```bash
-uv sync --extra dev
+uv sync --extra dev --extra gui
 export SERPAPI_KEY=...        # required for search; free tier is 250 searches/month
 ```
 
@@ -39,6 +39,16 @@ shopping-agent watch "toddler booster seat" --target 25
 shopping-agent check-watches
 shopping-agent quota
 ```
+
+Or use the desktop UI, which drives the same code:
+
+```bash
+shopping-agent-gui
+```
+
+It shows the per-dimension breakdown behind every score, renders an unscored
+dimension as `?` rather than a number, and labels prices as coming from one
+merchant rather than as the lowest available.
 
 ## Household data stays local
 

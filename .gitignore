@@ -4,6 +4,11 @@ preferences.db
 *.db
 *.sqlite
 *.sqlite3
+# SQLite runs in WAL mode, so these sidecars hold database content too.
+*.db-shm
+*.db-wal
+*.sqlite-shm
+*.sqlite-wal
 
 # Secrets — API keys live in the environment only.
 .env
