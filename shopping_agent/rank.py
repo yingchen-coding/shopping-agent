@@ -56,6 +56,27 @@ def _avoid_score(text: str, avoided: frozenset[str]) -> tuple[float | None, str]
     return 1.0, "none of the avoided terms appear"
 
 
+# A high average over a handful of ratings is not evidence of reliability, so
+# below this the dimension is Unknown rather than scored.
+MIN_REVIEWS_FOR_RELIABILITY = 10
+
+
+def _reliability_score(rating: float | None, reviews: int | None) -> tuple[float | None, str]:
+    """Merchant rating, but only once enough people have rated it.
+
+    Ratings cluster between 4 and 5, so the scale is stretched across that range
+    instead of 0-5 — otherwise every product scores ~0.9 and the dimension
+    stops discriminating.
+    """
+    if rating is None:
+        return None, "no rating published"
+    if reviews is None or reviews < MIN_REVIEWS_FOR_RELIABILITY:
+        return None, f"only {reviews or 0} rating(s) — too few to judge"
+    normalised = (float(rating) - 3.0) / 2.0
+    score = max(0.0, min(1.0, normalised))
+    return score, f"{rating}\u2605 from {reviews:,} ratings"
+
+
 def _safety_score(recall: RecallMatch | None) -> tuple[float | None, str]:
     """Absence of a recall is weak evidence of safety, not proof of it.
 
@@ -85,6 +106,8 @@ def build_candidate(
         weight = prefs.weight(dimension)
         if dimension == "safety":
             value, reason = _safety_score(recall)
+        elif dimension == "reliability":
+            value, reason = _reliability_score(product.rating, product.reviews)
         elif dimension == "budget":
             value, reason = _budget_score(product.representative_price, budget)
         elif dimension in ("brand-avoid", "material-avoid"):

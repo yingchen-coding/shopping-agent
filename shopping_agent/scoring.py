@@ -9,7 +9,9 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 
 # The axes a Preference can be expressed on. Order is display order.
-DIMENSIONS = ("safety", "eco", "budget", "brand-avoid", "material-avoid")
+DIMENSIONS = (
+    "safety", "reliability", "eco", "budget", "brand-avoid", "material-avoid",
+)
 
 
 class _Unknown:

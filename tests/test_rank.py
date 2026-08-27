@@ -71,3 +71,34 @@ def test_under_three_beneficiary_gets_a_small_parts_warning():
     member = {"name": "alex", "birthdate": "2024-01-01"}
     c = build_candidate(_product(snippet="contains small parts"), prefs, member=member)
     assert any("small parts" in w for w in c.warnings)
+
+
+def _rated(rating, reviews, title="Widget"):
+    return Product("p1", title, 50.0, "ShopCo", "http://x", rating, reviews, "", False)
+
+
+def test_reliability_is_unknown_below_the_review_threshold():
+    """A 5-star average over three ratings is not evidence — Unknown, not high."""
+    prefs = merge([Preference("reliability", 2)], [])
+    c = build_candidate(_rated(5.0, 3), prefs)
+    assert c.score.dimensions[0].value is UNKNOWN
+    assert "too few" in c.score.dimensions[0].reason
+
+
+def test_reliability_is_unknown_when_nothing_is_rated():
+    prefs = merge([Preference("reliability", 2)], [])
+    assert build_candidate(_rated(None, None), prefs).score.value is UNKNOWN
+
+
+def test_reliability_discriminates_across_the_range_ratings_actually_occupy():
+    """Ratings cluster in 4-5; the scale must separate them, not squash them."""
+    prefs = merge([Preference("reliability", 2)], [])
+    low = build_candidate(_rated(4.0, 500), prefs).score.value
+    high = build_candidate(_rated(4.8, 500), prefs).score.value
+    assert 0.0 < float(low) < float(high) <= 1.0
+    assert float(high) - float(low) > 0.2, "4.0 and 4.8 must not score nearly the same"
+
+
+def test_a_poor_rating_scores_zero_rather_than_unknown():
+    prefs = merge([Preference("reliability", 2)], [])
+    assert build_candidate(_rated(2.5, 800), prefs).score.value == 0.0

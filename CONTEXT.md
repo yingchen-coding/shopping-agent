@@ -72,8 +72,10 @@ it can never remove a Product. Anything with the power to remove is a Constraint
 _Avoid_: Rule, requirement, filter — all three imply exclusion power that a Preference does not have.
 
 **Dimension**:
-One axis a Preference is expressed on: safety, eco, budget, brand-avoid, material-avoid. Each
-Dimension is scored independently and reported independently.
+One axis a Preference is expressed on: safety, reliability, eco, budget, brand-avoid,
+material-avoid. Each Dimension is scored independently and reported independently. A Dimension only
+earns its place if it can actually be scored from available evidence some of the time — one that
+would always be Unknown adds noise to every result while telling the household nothing.
 _Avoid_: Criterion, factor, feature.
 
 **Preference Scope**:
