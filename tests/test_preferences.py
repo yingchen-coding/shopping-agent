@@ -29,6 +29,31 @@ def test_notes_from_both_levels_are_kept():
 
 
 def test_unset_dimension_has_zero_weight_and_no_avoids():
+    """Checked against a non-empty set: an empty one now falls back to the
+    baseline, which is a different case covered separately below."""
+    effective = merge([Preference("safety", 2)], [])
+    assert effective.weight("eco") == 0
+    assert effective.avoided("eco") == frozenset()
+
+
+def test_an_empty_set_falls_back_to_the_baseline_rather_than_scoring_nothing():
+    """With nothing stored, every product would otherwise be unscorable — which
+    reads as a broken search rather than as an unconfigured one."""
     effective = merge([], [])
-    assert effective.weight("safety") == 0
-    assert effective.avoided("safety") == frozenset()
+    assert effective.is_baseline is True
+    assert effective.dimensions == ["safety", "reliability", "budget"]
+    assert all(effective.weight(d) > 0 for d in effective.dimensions)
+
+
+def test_the_baseline_is_not_applied_once_anything_is_stored():
+    """A household that stated only eco has deliberately not asked about budget."""
+    effective = merge([Preference("eco", 2)], [])
+    assert effective.is_baseline is False
+    assert effective.dimensions == ["eco"]
+    assert effective.weight("budget") == 0
+
+
+def test_a_category_only_match_still_suppresses_the_baseline():
+    effective = merge([], [Preference("material-avoid", 1)])
+    assert effective.is_baseline is False
+    assert effective.dimensions == ["material-avoid"]

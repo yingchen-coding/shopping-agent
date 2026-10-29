@@ -10,6 +10,14 @@ from dataclasses import dataclass, field
 
 from .scoring import DIMENSIONS
 
+# Applied only when the household has stated nothing that bears on a Shopping
+# Request. These three need no stored preference to mean something: any product
+# can be checked against recalls, read for a rating, and compared to a budget.
+# Without them a search with no member and no category scores every result as
+# unscorable, which reads as a failure rather than as "you have set nothing up".
+BASELINE_DIMENSIONS = ("safety", "reliability", "budget")
+BASELINE_WEIGHT = 1.0
+
 
 @dataclass(frozen=True)
 class Preference:
@@ -40,6 +48,7 @@ class EffectivePreferenceSet:
 
     by_dimension: dict[str, Preference] = field(default_factory=dict)
     sources: dict[str, list[str]] = field(default_factory=dict)
+    is_baseline: bool = False
 
     def weight(self, dimension: str) -> float:
         pref = self.by_dimension.get(dimension)
@@ -81,4 +90,17 @@ def merge(
                 note=" / ".join(notes),
                 avoid=existing.avoid | pref.avoid,
             )
+
+    if not effective.by_dimension:
+        # Nothing stated applies here. Fall back rather than return a set that
+        # scores nothing — but only when the household has said nothing at all,
+        # so a deliberate choice to ignore, say, budget is still respected.
+        return EffectivePreferenceSet(
+            by_dimension={
+                d: Preference(d, BASELINE_WEIGHT, "no preference stored — baseline applied")
+                for d in BASELINE_DIMENSIONS
+            },
+            sources={d: ["baseline"] for d in BASELINE_DIMENSIONS},
+            is_baseline=True,
+        )
     return effective

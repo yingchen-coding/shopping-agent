@@ -126,8 +126,9 @@ def cmd_search(args, conn) -> int:
     if args.member:
         print(f"ranked for {args.member} · preferences: "
               f"{', '.join(prefs.dimensions) or 'none set'}")
-    if not prefs.dimensions:
-        print("note: no preferences apply, so ranking is by search order only")
+    if prefs.is_baseline:
+        print(f"note: nothing stored for this search — scoring on the baseline "
+              f"({', '.join(prefs.dimensions)}). Use --for/--category to apply your own.")
 
     for c in rank(candidates)[:args.limit]:
         price = (f"${c.product.representative_price:.2f}"

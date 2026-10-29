@@ -227,7 +227,8 @@ class SearchTab(_Threaded):
         failed = note.startswith("⚠️")
         self.status.setText(
             f"{len(products)} product(s) · {note} · {len(self._rows)} ranked, {len(vetoed)} excluded"
-            + ("" if prefs.dimensions else " · no preferences apply, so order is search order")
+            + (" · nothing stored for this search, so the baseline "
+               f"({', '.join(prefs.dimensions)}) was used" if prefs.is_baseline else "")
         )
         self.status.setStyleSheet("color:#b54137;" if failed else "color:#166534;")
 
